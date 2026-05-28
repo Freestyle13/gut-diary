@@ -636,10 +636,10 @@ export default function App() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const S = {
-  root:         { fontFamily: "-apple-system,sans-serif", background: "#FBF6F0", minHeight: "100vh", maxWidth: 430, margin: "0 auto", position: "relative", paddingBottom: 80 },
-  header:       { background: "linear-gradient(135deg,#3D2C2C 0%,#5C3D3D 100%)", padding: "18px 20px 14px", position: "sticky", top: 0, zIndex: 10 },
-  content:      { padding: "16px 16px 0" },
-  nav:          { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "#FBF6F0", borderTop: "1px solid #EDE0D4", display: "flex", justifyContent: "space-around", padding: "6px 0 8px", zIndex: 100 },
+  root:         { fontFamily: "-apple-system,sans-serif", background: "#FBF6F0", height: "100%", maxWidth: 430, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" },
+  header:       { background: "linear-gradient(135deg,#3D2C2C 0%,#5C3D3D 100%)", padding: "calc(env(safe-area-inset-top) + 14px) 20px 14px", flexShrink: 0 },
+  content:      { flex: 1, overflowY: "auto", padding: "16px 16px calc(env(safe-area-inset-bottom) + 80px)" },
+  nav:          { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "#FBF6F0", borderTop: "1px solid #EDE0D4", display: "flex", justifyContent: "space-around", padding: "6px 0 calc(env(safe-area-inset-bottom) + 8px)", zIndex: 100 },
   card:         { background: "#FFF", borderRadius: 20, padding: 20, marginBottom: 16, boxShadow: "0 2px 16px rgba(61,44,44,0.07)" },
   cardHeader:   { display: "flex", alignItems: "center", gap: 10, marginBottom: 18 },
   cardTitle:    { fontFamily: "Georgia,serif", fontSize: 20, fontWeight: 700, color: "#3D2C2C" },
