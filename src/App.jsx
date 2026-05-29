@@ -40,6 +40,7 @@ const fmtDate = iso => new Date(iso).toLocaleDateString("en-US", { month: "short
 const fmtTime = iso => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 // datetime-local input requires "YYYY-MM-DDTHH:MM"
 const toInputVal = () => { const d = new Date(); d.setSeconds(0,0); const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().slice(0,16); };
+const isoToInputVal = iso => { const d = new Date(iso); const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().slice(0,16); };
 const inputToISO = val => val ? new Date(val).toISOString() : now();
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -167,16 +168,17 @@ function DateTimeField({ value, onChange }) {
 }
 
 // ── Forms ─────────────────────────────────────────────────────────────────────
-function FoodForm({ onSave }) {
-  const [mealType, setMealType] = useState("Breakfast");
-  const [foods, setFoods] = useState("");
-  const [notes, setNotes] = useState("");
-  const [entryDt, setEntryDt] = useState(toInputVal);
+function FoodForm({ onSave, initial, onCancel }) {
+  const [mealType, setMealType] = useState(initial?.mealType || "Breakfast");
+  const [foods, setFoods] = useState(initial?.foods || "");
+  const [notes, setNotes] = useState(initial?.notes || "");
+  const [entryDt, setEntryDt] = useState(initial ? isoToInputVal(initial.ts) : toInputVal);
   const [saved, setSaved] = useState(false);
+  const isEdit = !!initial;
   const handleSave = () => {
     if (!foods.trim()) return;
     onSave({ type: "food", ts: inputToISO(entryDt), mealType, foods, notes });
-    setFoods(""); setNotes(""); setEntryDt(toInputVal());
+    if (!isEdit) { setFoods(""); setNotes(""); setEntryDt(toInputVal()); }
     setSaved(true); setTimeout(() => setSaved(false), 1800);
   };
   return (
@@ -188,25 +190,27 @@ function FoodForm({ onSave }) {
       </div>
       <textarea placeholder="What did you eat? Be as detailed as you like…" value={foods} onChange={e => setFoods(e.target.value)} style={S.textarea} rows={3} />
       <textarea placeholder="Notes? (mood, stress, where you ate…)" value={notes} onChange={e => setNotes(e.target.value)} style={{ ...S.textarea, marginBottom: 16 }} rows={2} />
-      <button onClick={handleSave} style={{ ...S.saveBtn, ...(saved ? S.savedBtn : {}) }}>{saved ? "✓ Saved!" : "Save Meal"}</button>
+      <button onClick={handleSave} style={{ ...S.saveBtn, ...(saved ? S.savedBtn : {}) }}>{saved ? "✓ Saved!" : isEdit ? "Update Meal" : "Save Meal"}</button>
+      {isEdit && <button onClick={onCancel} style={{ ...S.saveBtn, background: "transparent", color: "#9A7A7A", border: "1.5px solid #EDE0D4", marginTop: 8 }}>Cancel</button>}
     </div>
   );
 }
 
-function BeverageForm({ onSave }) {
-  const [drinkType, setDrinkType] = useState(null);
-  const [drinkName, setDrinkName] = useState("");
-  const [size, setSize] = useState("Medium");
-  const [modifiers, setModifiers] = useState([]);
-  const [notes, setNotes] = useState("");
-  const [entryDt, setEntryDt] = useState(toInputVal);
+function BeverageForm({ onSave, initial, onCancel }) {
+  const [drinkType, setDrinkType] = useState(initial?.drinkType || null);
+  const [drinkName, setDrinkName] = useState(initial?.drinkName || "");
+  const [size, setSize] = useState(initial?.size || "Medium");
+  const [modifiers, setModifiers] = useState(initial?.modifiers || []);
+  const [notes, setNotes] = useState(initial?.notes || "");
+  const [entryDt, setEntryDt] = useState(initial ? isoToInputVal(initial.ts) : toInputVal);
   const [saved, setSaved] = useState(false);
+  const isEdit = !!initial;
   const toggleMod = m => setModifiers(p => p.includes(m) ? p.filter(x => x !== m) : [...p, m]);
   const selected = DRINK_TYPES.find(d => d.id === drinkType);
   const handleSave = () => {
     if (!drinkType) return;
     onSave({ type: "beverage", ts: inputToISO(entryDt), drinkType, drinkName: drinkName || selected?.label, size, modifiers, notes });
-    setDrinkType(null); setDrinkName(""); setSize("Medium"); setModifiers([]); setNotes(""); setEntryDt(toInputVal());
+    if (!isEdit) { setDrinkType(null); setDrinkName(""); setSize("Medium"); setModifiers([]); setNotes(""); setEntryDt(toInputVal()); }
     setSaved(true); setTimeout(() => setSaved(false), 1800);
   };
   return (
@@ -244,28 +248,31 @@ function BeverageForm({ onSave }) {
         <textarea placeholder="Notes…" value={notes} onChange={e => setNotes(e.target.value)} style={{ ...S.textarea, marginBottom: 16 }} rows={2} />
       </>)}
       <button onClick={handleSave} disabled={!drinkType} style={{ ...S.saveBtn, ...(saved ? S.savedBtn : {}), opacity: drinkType ? 1 : 0.4 }}>
-        {saved ? "✓ Saved!" : "Save Beverage"}
+        {saved ? "✓ Saved!" : isEdit ? "Update Beverage" : "Save Beverage"}
       </button>
+      {isEdit && <button onClick={onCancel} style={{ ...S.saveBtn, background: "transparent", color: "#9A7A7A", border: "1.5px solid #EDE0D4", marginTop: 8 }}>Cancel</button>}
     </div>
   );
 }
 
-function SymptomForm({ onSave }) {
-  const [category, setCategory] = useState("discomfort");
-  const [bristol, setBristol] = useState(null);
-  const [locations, setLocations] = useState([]);
-  const [onset, setOnset] = useState(null);
-  const [pain, setPain] = useState(0);
-  const [symptoms, setSymptoms] = useState([]);
-  const [notes, setNotes] = useState("");
-  const [entryDt, setEntryDt] = useState(toInputVal);
+function SymptomForm({ onSave, initial, onCancel }) {
+  const [category, setCategory] = useState(initial?.symptomCategory || "discomfort");
+  const [bristol, setBristol] = useState(initial?.bristol || null);
+  const [locations, setLocations] = useState(initial?.locations || []);
+  const [onset, setOnset] = useState(initial?.onset || null);
+  const [pain, setPain] = useState(initial?.pain || 0);
+  const [symptoms, setSymptoms] = useState(initial?.symptoms || []);
+  const [notes, setNotes] = useState(initial?.notes || "");
+  const [entryDt, setEntryDt] = useState(initial ? isoToInputVal(initial.ts) : toInputVal);
   const [saved, setSaved] = useState(false);
+  const isEdit = !!initial;
   const toggleSym = s => setSymptoms(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
   const toggleLoc = l => setLocations(p => p.includes(l) ? p.filter(x => x !== l) : [...p, l]);
   const reset = () => { setBristol(null); setLocations([]); setOnset(null); setPain(0); setSymptoms([]); setNotes(""); setEntryDt(toInputVal()); };
   const handleSave = () => {
     onSave({ type: "symptom", ts: inputToISO(entryDt), symptomCategory: category, bristol, locations, onset, pain, symptoms, notes });
-    reset(); setSaved(true); setTimeout(() => setSaved(false), 1800);
+    if (!isEdit) reset();
+    setSaved(true); setTimeout(() => setSaved(false), 1800);
   };
   return (
     <div style={S.card}>
@@ -330,7 +337,8 @@ function SymptomForm({ onSave }) {
         </div>
       </div>
       <textarea placeholder="Notes… (e.g. 'started 20 mins after dinner', 'worse when lying down')" value={notes} onChange={e => setNotes(e.target.value)} style={{ ...S.textarea, marginBottom: 16 }} rows={2} />
-      <button onClick={handleSave} style={{ ...S.saveBtn, ...(saved ? S.savedBtn : {}) }}>{saved ? "✓ Saved!" : "Save Entry"}</button>
+      <button onClick={handleSave} style={{ ...S.saveBtn, ...(saved ? S.savedBtn : {}) }}>{saved ? "✓ Saved!" : isEdit ? "Update Entry" : "Save Entry"}</button>
+      {isEdit && <button onClick={onCancel} style={{ ...S.saveBtn, background: "transparent", color: "#9A7A7A", border: "1.5px solid #EDE0D4", marginTop: 8 }}>Cancel</button>}
     </div>
   );
 }
@@ -373,8 +381,24 @@ const entryLabel = e => {
   return e.drinkName || DRINK_TYPES.find(d => d.id === e.drinkType)?.label || "Drink";
 };
 
+// ── Edit Modal ────────────────────────────────────────────────────────────────
+function EditModal({ entry, onSave, onClose }) {
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(30,18,10,0.7)", zIndex: 200, display: "flex", alignItems: "flex-end" }} onClick={onClose}>
+      <div style={{ background: "#FBF6F0", borderRadius: "24px 24px 0 0", width: "100%", maxWidth: 430, margin: "0 auto", maxHeight: "90vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
+        <div style={{ width: 40, height: 4, background: "#EDE0D4", borderRadius: 2, margin: "16px auto 4px" }} />
+        <div style={{ padding: "0 16px 40px" }}>
+          {entry.type === "food"     && <FoodForm     initial={entry} onSave={onSave} onCancel={onClose} />}
+          {entry.type === "beverage" && <BeverageForm initial={entry} onSave={onSave} onCancel={onClose} />}
+          {entry.type === "symptom"  && <SymptomForm  initial={entry} onSave={onSave} onCancel={onClose} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── History Tab ───────────────────────────────────────────────────────────────
-function HistoryTab({ entries, onDelete, onExport, onBackup, onRestore }) {
+function HistoryTab({ entries, onDelete, onEdit, onExport, onBackup, onRestore }) {
   const [importMsg, setImportMsg] = useState(null);
   const handleFile = e => {
     const file = e.target.files?.[0];
@@ -442,7 +466,10 @@ function HistoryTab({ entries, onDelete, onExport, onBackup, onRestore }) {
                   )}
                   {e.notes && <div style={{ fontSize: 12, color: "#9A7A7A", fontStyle: "italic", marginTop: 4 }}>{e.notes}</div>}
                 </div>
-                <button onClick={() => onDelete(e.ts)} style={{ border: "none", background: "none", color: "#D4B0A0", fontSize: 16, cursor: "pointer", padding: "0 4px", alignSelf: "flex-start" }}>✕</button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "center" }}>
+                  <button onClick={() => onEdit(e)} style={{ border: "none", background: "none", color: "#C49A6C", fontSize: 14, cursor: "pointer", padding: "0 4px" }}>✏️</button>
+                  <button onClick={() => onDelete(e.ts)} style={{ border: "none", background: "none", color: "#D4B0A0", fontSize: 14, cursor: "pointer", padding: "0 4px" }}>✕</button>
+                </div>
               </div>
             </div>
           ))}
@@ -840,12 +867,17 @@ export default function App() {
   const [entries, setEntries] = useState([]);
   const [tab, setTab] = useState("log");
   const [showHelp, setShowHelp] = useState(false);
+  const [editEntry, setEditEntry] = useState(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => { loadDB().then(data => { setEntries(data); setReady(true); }); }, []);
 
   const addEntry = e => { const next = [...entries, e]; setEntries(next); saveDB(next); };
   const deleteEntry = ts => { const next = entries.filter(e => e.ts !== ts); setEntries(next); saveDB(next); };
+  const updateEntry = updated => {
+    const next = entries.map(e => e.ts === editEntry.ts ? updated : e);
+    setEntries(next); saveDB(next); setEditEntry(null);
+  };
   const restoreEntries = imported => {
     const merged = [...entries, ...imported].reduce((acc, e) => {
       if (!acc.find(x => x.ts === e.ts)) acc.push(e);
@@ -863,6 +895,7 @@ export default function App() {
   return (
     <div style={S.root}>
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {editEntry && <EditModal entry={editEntry} onSave={updateEntry} onClose={() => setEditEntry(null)} />}
       <div style={S.header}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
@@ -874,7 +907,7 @@ export default function App() {
       </div>
       <div style={S.content}>
         {tab === "log"      && <LogTab onSave={addEntry} />}
-        {tab === "history"  && <HistoryTab entries={entries} onDelete={deleteEntry} onExport={() => exportCSV(entries)} onBackup={() => exportJSON(entries)} onRestore={restoreEntries} />}
+        {tab === "history"  && <HistoryTab entries={entries} onDelete={deleteEntry} onEdit={setEditEntry} onExport={() => exportCSV(entries)} onBackup={() => exportJSON(entries)} onRestore={restoreEntries} />}
         {tab === "insights" && <InsightsTab entries={entries} />}
       </div>
       <div style={S.nav}>
