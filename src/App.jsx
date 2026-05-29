@@ -710,34 +710,6 @@ function InsightsTab({ entries }) {
         <PainCalendar entries={entries} />
       </div>
 
-      {/* Time of day */}
-      {sE.filter(e => (e.pain || 0) >= 4).length > 0 && (
-        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
-          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>🕐 Time of day</div>
-          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 14 }}>When symptoms most often occur</div>
-          {Object.entries(timeBuckets).map(([name, count]) => (
-            <div key={name} style={{ marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 12, color: "#3D2C2C", fontWeight: 600 }}>{bucketEmoji[name]} {name} <span style={{ color: "#B09090", fontWeight: 400 }}>{bucketTime[name]}</span></span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: count === maxBucket && count > 0 ? "#C49A6C" : "#9A7A7A" }}>{count}</span>
-              </div>
-              <div style={{ height: 8, background: "#F5EDE4", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${(count / maxBucket) * 100}%`, background: count === maxBucket && count > 0 ? "#C49A6C" : "#D4C0B0", borderRadius: 4, transition: "width 0.3s" }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Bristol line graph */}
-      {hasBMs && (
-        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
-          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 2 }}>💩 Stool type trend</div>
-          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 10 }}>Green zone = ideal range (types 3–4)</div>
-          <BristolLineGraph entries={entries} />
-        </div>
-      )}
-
       {/* Pre-symptom window */}
       {preWindow && (preWindow.drinks.length > 0 || preWindow.foods.length > 0) && (
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
@@ -767,6 +739,35 @@ function InsightsTab({ entries }) {
           )}
         </div>
       )}
+
+      {/* Time of day */}
+      {sE.filter(e => (e.pain || 0) >= 4).length > 0 && (
+        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
+          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>🕐 Time of day</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 14 }}>When symptoms most often occur</div>
+          {Object.entries(timeBuckets).map(([name, count]) => (
+            <div key={name} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ fontSize: 12, color: "#3D2C2C", fontWeight: 600 }}>{bucketEmoji[name]} {name} <span style={{ color: "#B09090", fontWeight: 400 }}>{bucketTime[name]}</span></span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: count === maxBucket && count > 0 ? "#C49A6C" : "#9A7A7A" }}>{count}</span>
+              </div>
+              <div style={{ height: 8, background: "#F5EDE4", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${(count / maxBucket) * 100}%`, background: count === maxBucket && count > 0 ? "#C49A6C" : "#D4C0B0", borderRadius: 4, transition: "width 0.3s" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Bristol line graph */}
+      {hasBMs && (
+        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
+          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 2 }}>💩 Stool type trend</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 10 }}>Green zone = ideal range (types 3–4)</div>
+          <BristolLineGraph entries={entries} />
+        </div>
+      )}
+
       {topSym.length > 0 && (
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
           <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 12 }}>⚡ Most frequent symptoms</div>
