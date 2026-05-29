@@ -510,7 +510,7 @@ function BristolLineGraph({ entries }) {
       <line x1={pL} y1={yTop} x2={pL + cW} y2={yTop} stroke="#6BAF92" strokeWidth="1.2" strokeDasharray="5,4" opacity="0.8" />
       <line x1={pL} y1={yBot} x2={pL + cW} y2={yBot} stroke="#6BAF92" strokeWidth="1.2" strokeDasharray="5,4" opacity="0.8" />
       {/* "Healthy" label */}
-      <text x={pL + cW - 2} y={yTop - 3} textAnchor="end" fontSize="8" fill="#6BAF92" opacity="0.9" fontWeight="700">healthy range</text>
+      <text x={pL + cW - 2} y={yTop - 3} textAnchor="end" fontSize="8" fill="#6BAF92" opacity="0.9" fontWeight="700">ideal range</text>
       {/* Y axis labels */}
       {[1,2,3,4,5,6,7].map(b => (
         <text key={b} x={pL - 4} y={fy(b) + 3.5} textAnchor="end" fontSize="8.5"
@@ -595,7 +595,7 @@ function InsightsTab({ entries }) {
       {hasBMs && (
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
           <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 2 }}>💩 Stool type trend</div>
-          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 10 }}>Green zone = healthy range (types 3–4)</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 10 }}>Green zone = ideal range (types 3–4)</div>
           <BristolLineGraph entries={entries} />
         </div>
       )}
