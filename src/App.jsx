@@ -86,7 +86,8 @@ const TABS = [
 // ── Exports ───────────────────────────────────────────────────────────────────
 function exportCSV(entries) {
   const rows = [["Date","Time","Type","Subtype","Detail","Quantity","Modifiers","Symptom Category","Bristol Scale","Body Location","Onset","Pain (1-10)","Symptoms","Notes"]];
-  entries.forEach(e => rows.push([
+  const sorted = [...entries].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+  sorted.forEach(e => rows.push([
     fmtDate(e.ts), fmtTime(e.ts), e.type,
     e.mealType || e.drinkType || "",
     (e.foods || e.drinkName || "").replace(/,/g,";"),
@@ -107,7 +108,8 @@ function exportCSV(entries) {
   a.click();
 }
 function exportJSON(entries) {
-  const backup = { version: 1, exportedAt: new Date().toISOString(), entries };
+  const sorted = [...entries].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+  const backup = { version: 1, exportedAt: new Date().toISOString(), entries: sorted };
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }));
   a.download = `gutdiary-backup-${new Date().toISOString().slice(0,10)}.json`;
