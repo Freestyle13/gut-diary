@@ -680,7 +680,7 @@ function InsightsTab({ entries }) {
 
   // Time of day buckets
   const timeBuckets = { Morning: 0, Afternoon: 0, Evening: 0, Night: 0 };
-  sE.filter(e => e.pain > 0).forEach(e => {
+  sE.filter(e => (e.pain || 0) >= 4).forEach(e => {
     const h = new Date(e.ts).getHours();
     if (h >= 6 && h < 12) timeBuckets.Morning++;
     else if (h >= 12 && h < 18) timeBuckets.Afternoon++;
@@ -711,7 +711,7 @@ function InsightsTab({ entries }) {
       </div>
 
       {/* Time of day */}
-      {sE.filter(e => e.pain > 0).length > 0 && (
+      {sE.filter(e => (e.pain || 0) >= 4).length > 0 && (
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
           <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>🕐 Time of day</div>
           <div style={{ fontSize: 11, color: "#B09090", marginBottom: 14 }}>When symptoms most often occur</div>
