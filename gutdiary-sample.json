@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "exportedAt": "2026-05-28T12:00:00.000Z",
+  "entries": [
+    {"type":"food","ts":"2026-05-14T08:15:00.000Z","mealType":"Breakfast","foods":"Oatmeal with blueberries and honey, black coffee","notes":"Felt fine"},
+    {"type":"beverage","ts":"2026-05-14T08:20:00.000Z","drinkType":"coffee","drinkName":"Black coffee","size":"Medium","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-14T12:30:00.000Z","mealType":"Lunch","foods":"Turkey sandwich on wheat, bag of chips, diet coke","notes":"Ate at desk"},
+    {"type":"beverage","ts":"2026-05-14T12:35:00.000Z","drinkType":"soda","drinkName":"Diet Coke","size":"Large","modifiers":["Carbonated"],"notes":""},
+    {"type":"symptom","ts":"2026-05-14T15:00:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["lower","left"],"onset":"After eating","pain":4,"symptoms":["Bloating","Gas"],"notes":"Started about 2 hours after lunch"},
+
+    {"type":"food","ts":"2026-05-15T07:45:00.000Z","mealType":"Breakfast","foods":"Greek yogurt with granola, orange juice","notes":""},
+    {"type":"beverage","ts":"2026-05-15T07:50:00.000Z","drinkType":"juice","drinkName":"Orange juice","size":"Small","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-15T13:00:00.000Z","mealType":"Lunch","foods":"Caesar salad with grilled chicken, water","notes":""},
+    {"type":"beverage","ts":"2026-05-15T13:05:00.000Z","drinkType":"water","drinkName":"Water","size":"Large","modifiers":[],"notes":""},
+    {"type":"symptom","ts":"2026-05-15T20:00:00.000Z","symptomCategory":"bm","bristol":4,"locations":[],"onset":null,"pain":1,"symptoms":[],"notes":"Normal"},
+
+    {"type":"food","ts":"2026-05-16T08:30:00.000Z","mealType":"Breakfast","foods":"Scrambled eggs with toast, coffee with oat milk","notes":""},
+    {"type":"beverage","ts":"2026-05-16T08:35:00.000Z","drinkType":"coffee","drinkName":"Latte","size":"Large","modifiers":["Plant-based milk","Caffeinated"],"notes":""},
+    {"type":"food","ts":"2026-05-16T19:30:00.000Z","mealType":"Dinner","foods":"Pasta with cream sauce, garlic bread, glass of red wine","notes":"Birthday dinner"},
+    {"type":"beverage","ts":"2026-05-16T19:35:00.000Z","drinkType":"alcohol","drinkName":"Red wine","size":"Medium","modifiers":[],"notes":""},
+    {"type":"symptom","ts":"2026-05-16T22:00:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["upper","full"],"onset":"After eating","pain":7,"symptoms":["Bloating","Cramping","Heartburn","Nausea"],"notes":"Worst after the cream sauce and wine"},
+
+    {"type":"food","ts":"2026-05-17T09:00:00.000Z","mealType":"Breakfast","foods":"Plain toast, chamomile tea","notes":"Stomach still off from last night"},
+    {"type":"beverage","ts":"2026-05-17T09:05:00.000Z","drinkType":"tea","drinkName":"Chamomile tea","size":"Medium","modifiers":[],"notes":""},
+    {"type":"symptom","ts":"2026-05-17T10:00:00.000Z","symptomCategory":"bm","bristol":6,"locations":[],"onset":null,"pain":3,"symptoms":["Urgency","Cramping"],"notes":"Loose, likely from last night"},
+    {"type":"food","ts":"2026-05-17T13:00:00.000Z","mealType":"Lunch","foods":"Chicken soup, plain crackers, water","notes":"Keeping it bland"},
+    {"type":"beverage","ts":"2026-05-17T13:05:00.000Z","drinkType":"water","drinkName":"Water","size":"Large","modifiers":[],"notes":""},
+
+    {"type":"food","ts":"2026-05-18T08:00:00.000Z","mealType":"Breakfast","foods":"Banana, peanut butter toast, coffee","notes":""},
+    {"type":"beverage","ts":"2026-05-18T08:05:00.000Z","drinkType":"coffee","drinkName":"Black coffee","size":"Medium","modifiers":["Caffeinated"],"notes":""},
+    {"type":"food","ts":"2026-05-18T12:30:00.000Z","mealType":"Lunch","foods":"Grilled salmon, steamed broccoli, brown rice","notes":""},
+    {"type":"food","ts":"2026-05-18T19:00:00.000Z","mealType":"Dinner","foods":"Chicken stir fry with vegetables and soy sauce","notes":""},
+    {"type":"symptom","ts":"2026-05-18T21:00:00.000Z","symptomCategory":"bm","bristol":3,"locations":[],"onset":null,"pain":1,"symptoms":[],"notes":"Slightly hard but ok"},
+
+    {"type":"food","ts":"2026-05-19T08:15:00.000Z","mealType":"Breakfast","foods":"Smoothie with banana, spinach, almond milk, protein powder","notes":""},
+    {"type":"beverage","ts":"2026-05-19T08:20:00.000Z","drinkType":"smoothie","drinkName":"Green protein smoothie","size":"Large","modifiers":["Plant-based milk"],"notes":""},
+    {"type":"food","ts":"2026-05-19T13:00:00.000Z","mealType":"Lunch","foods":"Burrito bowl — rice, black beans, chicken, cheese, sour cream","notes":"From Chipotle"},
+    {"type":"symptom","ts":"2026-05-19T16:00:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["lower"],"onset":"After eating","pain":5,"symptoms":["Bloating","Gas","Cramping"],"notes":"Always get this after Chipotle"},
+    {"type":"beverage","ts":"2026-05-19T19:00:00.000Z","drinkType":"alcohol","drinkName":"Beer","size":"Medium","modifiers":["Carbonated"],"notes":""},
+
+    {"type":"food","ts":"2026-05-20T09:00:00.000Z","mealType":"Breakfast","foods":"Avocado toast, poached eggs, green tea","notes":""},
+    {"type":"beverage","ts":"2026-05-20T09:05:00.000Z","drinkType":"tea","drinkName":"Green tea","size":"Medium","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-20T13:30:00.000Z","mealType":"Lunch","foods":"Lentil soup with sourdough bread","notes":""},
+    {"type":"food","ts":"2026-05-20T19:30:00.000Z","mealType":"Dinner","foods":"Pizza — two slices pepperoni, two slices cheese","notes":""},
+    {"type":"beverage","ts":"2026-05-20T19:35:00.000Z","drinkType":"soda","drinkName":"Coke","size":"Large","modifiers":["Carbonated"],"notes":""},
+    {"type":"symptom","ts":"2026-05-20T22:30:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["upper","full"],"onset":"After eating","pain":6,"symptoms":["Bloating","Heartburn","Pressure"],"notes":"Pizza and soda combo not a good idea"},
+
+    {"type":"food","ts":"2026-05-21T08:00:00.000Z","mealType":"Breakfast","foods":"Oatmeal with banana and cinnamon, water","notes":""},
+    {"type":"beverage","ts":"2026-05-21T08:05:00.000Z","drinkType":"water","drinkName":"Water","size":"Large","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-21T12:30:00.000Z","mealType":"Lunch","foods":"Grilled chicken wrap with lettuce and tomato, apple","notes":""},
+    {"type":"symptom","ts":"2026-05-21T19:00:00.000Z","symptomCategory":"bm","bristol":4,"locations":[],"onset":null,"pain":0,"symptoms":[],"notes":"Good day"},
+
+    {"type":"food","ts":"2026-05-22T08:30:00.000Z","mealType":"Breakfast","foods":"Yogurt parfait with berries and granola","notes":""},
+    {"type":"beverage","ts":"2026-05-22T08:35:00.000Z","drinkType":"coffee","drinkName":"Coffee with cream","size":"Medium","modifiers":["With cream","Caffeinated"],"notes":""},
+    {"type":"food","ts":"2026-05-22T13:00:00.000Z","mealType":"Lunch","foods":"Sushi — salmon and tuna rolls, miso soup","notes":""},
+    {"type":"food","ts":"2026-05-22T19:00:00.000Z","mealType":"Dinner","foods":"Steak with roasted potatoes and salad","notes":""},
+    {"type":"beverage","ts":"2026-05-22T19:05:00.000Z","drinkType":"alcohol","drinkName":"Red wine","size":"Large","modifiers":[],"notes":"Two glasses"},
+    {"type":"symptom","ts":"2026-05-22T23:00:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["upper"],"onset":"After drinking","pain":4,"symptoms":["Heartburn","Bloating"],"notes":"Wine again"},
+
+    {"type":"food","ts":"2026-05-23T09:00:00.000Z","mealType":"Breakfast","foods":"Eggs and toast, black coffee","notes":""},
+    {"type":"beverage","ts":"2026-05-23T09:05:00.000Z","drinkType":"coffee","drinkName":"Black coffee","size":"Large","modifiers":["Caffeinated"],"notes":""},
+    {"type":"food","ts":"2026-05-23T13:00:00.000Z","mealType":"Lunch","foods":"Tuna salad sandwich, chips, water","notes":""},
+    {"type":"beverage","ts":"2026-05-23T16:00:00.000Z","drinkType":"coffee","drinkName":"Iced coffee","size":"Large","modifiers":["With milk","Caffeinated"],"notes":"Afternoon pick-me-up"},
+    {"type":"symptom","ts":"2026-05-23T18:00:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["lower"],"onset":"Sudden","pain":3,"symptoms":["Urgency","Gas"],"notes":"Too much coffee today probably"},
+
+    {"type":"food","ts":"2026-05-24T08:00:00.000Z","mealType":"Breakfast","foods":"Oatmeal with almond milk, blueberries","notes":""},
+    {"type":"beverage","ts":"2026-05-24T08:05:00.000Z","drinkType":"water","drinkName":"Water","size":"Large","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-24T12:00:00.000Z","mealType":"Lunch","foods":"Vegetable soup, whole grain crackers","notes":""},
+    {"type":"food","ts":"2026-05-24T19:30:00.000Z","mealType":"Dinner","foods":"Grilled salmon with asparagus and quinoa","notes":""},
+    {"type":"symptom","ts":"2026-05-24T20:00:00.000Z","symptomCategory":"bm","bristol":4,"locations":[],"onset":null,"pain":0,"symptoms":[],"notes":""},
+
+    {"type":"food","ts":"2026-05-25T09:30:00.000Z","mealType":"Breakfast","foods":"Pancakes with maple syrup, bacon, orange juice","notes":"Weekend brunch"},
+    {"type":"beverage","ts":"2026-05-25T09:35:00.000Z","drinkType":"juice","drinkName":"Orange juice","size":"Medium","modifiers":[],"notes":""},
+    {"type":"beverage","ts":"2026-05-25T09:40:00.000Z","drinkType":"coffee","drinkName":"Coffee with cream and sugar","size":"Large","modifiers":["With cream","With sugar","Caffeinated"],"notes":""},
+    {"type":"food","ts":"2026-05-25T19:00:00.000Z","mealType":"Dinner","foods":"Tacos — three beef tacos with cheese and salsa","notes":""},
+    {"type":"beverage","ts":"2026-05-25T19:05:00.000Z","drinkType":"alcohol","drinkName":"Margarita","size":"Large","modifiers":[],"notes":""},
+    {"type":"symptom","ts":"2026-05-25T21:30:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["lower","full"],"onset":"After eating","pain":6,"symptoms":["Bloating","Cramping","Gas"],"notes":""},
+
+    {"type":"food","ts":"2026-05-26T08:30:00.000Z","mealType":"Breakfast","foods":"Plain rice cakes, banana, herbal tea","notes":"Recovery day"},
+    {"type":"beverage","ts":"2026-05-26T08:35:00.000Z","drinkType":"tea","drinkName":"Peppermint tea","size":"Medium","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-26T13:00:00.000Z","mealType":"Lunch","foods":"Plain grilled chicken, white rice, steamed carrots","notes":""},
+    {"type":"beverage","ts":"2026-05-26T13:05:00.000Z","drinkType":"water","drinkName":"Water","size":"Large","modifiers":[],"notes":""},
+    {"type":"symptom","ts":"2026-05-26T15:00:00.000Z","symptomCategory":"bm","bristol":5,"locations":[],"onset":null,"pain":2,"symptoms":["Urgency"],"notes":"Soft but manageable"},
+
+    {"type":"food","ts":"2026-05-27T08:00:00.000Z","mealType":"Breakfast","foods":"Oatmeal with honey, green tea","notes":""},
+    {"type":"beverage","ts":"2026-05-27T08:05:00.000Z","drinkType":"tea","drinkName":"Green tea","size":"Medium","modifiers":[],"notes":""},
+    {"type":"food","ts":"2026-05-27T12:30:00.000Z","mealType":"Lunch","foods":"Grilled chicken salad with olive oil dressing","notes":""},
+    {"type":"food","ts":"2026-05-27T19:00:00.000Z","mealType":"Dinner","foods":"Pasta with marinara sauce and meatballs","notes":""},
+    {"type":"symptom","ts":"2026-05-27T21:00:00.000Z","symptomCategory":"discomfort","bristol":null,"locations":["upper"],"onset":"After eating","pain":3,"symptoms":["Bloating","Heartburn"],"notes":"Marinara always does this"},
+    {"type":"symptom","ts":"2026-05-27T21:30:00.000Z","symptomCategory":"bm","bristol":4,"locations":[],"onset":null,"pain":1,"symptoms":[],"notes":""}
+  ]
+}

@@ -38,6 +38,9 @@ async function saveDB(entries) {
 const now = () => new Date().toISOString();
 const fmtDate = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 const fmtTime = iso => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+// datetime-local input requires "YYYY-MM-DDTHH:MM"
+const toInputVal = () => { const d = new Date(); d.setSeconds(0,0); return d.toISOString().slice(0,16); };
+const inputToISO = val => val ? new Date(val).toISOString() : now();
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const BRISTOL = [
@@ -145,21 +148,39 @@ function PainSlider({ value, onChange }) {
   );
 }
 
+// ── Date / Time picker ────────────────────────────────────────────────────────
+function DateTimeField({ value, onChange }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, background: "#FBF6F0", borderRadius: 10, padding: "8px 12px" }}>
+      <span style={{ fontSize: 15 }}>🕐</span>
+      <input
+        type="datetime-local"
+        value={value}
+        max={toInputVal()}
+        onChange={e => onChange(e.target.value)}
+        style={{ border: "none", background: "transparent", fontSize: 13, color: "#3D2C2C", fontFamily: "inherit", outline: "none", flex: 1, cursor: "pointer" }}
+      />
+    </div>
+  );
+}
+
 // ── Forms ─────────────────────────────────────────────────────────────────────
 function FoodForm({ onSave }) {
   const [mealType, setMealType] = useState("Breakfast");
   const [foods, setFoods] = useState("");
   const [notes, setNotes] = useState("");
+  const [entryDt, setEntryDt] = useState(toInputVal);
   const [saved, setSaved] = useState(false);
   const handleSave = () => {
     if (!foods.trim()) return;
-    onSave({ type: "food", ts: now(), mealType, foods, notes });
-    setFoods(""); setNotes("");
+    onSave({ type: "food", ts: inputToISO(entryDt), mealType, foods, notes });
+    setFoods(""); setNotes(""); setEntryDt(toInputVal());
     setSaved(true); setTimeout(() => setSaved(false), 1800);
   };
   return (
     <div style={S.card}>
       <div style={S.cardHeader}><span style={{ fontSize: 24 }}>🍽️</span><span style={S.cardTitle}>Log a Meal</span></div>
+      <DateTimeField value={entryDt} onChange={setEntryDt} />
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
         {MEALS.map(m => <button key={m} onClick={() => setMealType(m)} style={{ ...S.pill, ...(mealType === m ? S.pillActive : {}) }}>{m}</button>)}
       </div>
@@ -176,18 +197,20 @@ function BeverageForm({ onSave }) {
   const [size, setSize] = useState("Medium");
   const [modifiers, setModifiers] = useState([]);
   const [notes, setNotes] = useState("");
+  const [entryDt, setEntryDt] = useState(toInputVal);
   const [saved, setSaved] = useState(false);
   const toggleMod = m => setModifiers(p => p.includes(m) ? p.filter(x => x !== m) : [...p, m]);
   const selected = DRINK_TYPES.find(d => d.id === drinkType);
   const handleSave = () => {
     if (!drinkType) return;
-    onSave({ type: "beverage", ts: now(), drinkType, drinkName: drinkName || selected?.label, size, modifiers, notes });
-    setDrinkType(null); setDrinkName(""); setSize("Medium"); setModifiers([]); setNotes("");
+    onSave({ type: "beverage", ts: inputToISO(entryDt), drinkType, drinkName: drinkName || selected?.label, size, modifiers, notes });
+    setDrinkType(null); setDrinkName(""); setSize("Medium"); setModifiers([]); setNotes(""); setEntryDt(toInputVal());
     setSaved(true); setTimeout(() => setSaved(false), 1800);
   };
   return (
     <div style={S.card}>
       <div style={S.cardHeader}><span style={{ fontSize: 24 }}>🥤</span><span style={S.cardTitle}>Log a Beverage</span></div>
+      <DateTimeField value={entryDt} onChange={setEntryDt} />
       <div style={S.sectionLabel}>What are you drinking?</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16 }}>
         {DRINK_TYPES.map(d => (
@@ -233,17 +256,19 @@ function SymptomForm({ onSave }) {
   const [pain, setPain] = useState(0);
   const [symptoms, setSymptoms] = useState([]);
   const [notes, setNotes] = useState("");
+  const [entryDt, setEntryDt] = useState(toInputVal);
   const [saved, setSaved] = useState(false);
   const toggleSym = s => setSymptoms(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
   const toggleLoc = l => setLocations(p => p.includes(l) ? p.filter(x => x !== l) : [...p, l]);
-  const reset = () => { setBristol(null); setLocations([]); setOnset(null); setPain(0); setSymptoms([]); setNotes(""); };
+  const reset = () => { setBristol(null); setLocations([]); setOnset(null); setPain(0); setSymptoms([]); setNotes(""); setEntryDt(toInputVal()); };
   const handleSave = () => {
-    onSave({ type: "symptom", ts: now(), symptomCategory: category, bristol, locations, onset, pain, symptoms, notes });
+    onSave({ type: "symptom", ts: inputToISO(entryDt), symptomCategory: category, bristol, locations, onset, pain, symptoms, notes });
     reset(); setSaved(true); setTimeout(() => setSaved(false), 1800);
   };
   return (
     <div style={S.card}>
       <div style={S.cardHeader}><span style={{ fontSize: 24 }}>🌿</span><span style={S.cardTitle}>Log Symptoms</span></div>
+      <DateTimeField value={entryDt} onChange={setEntryDt} />
       <div style={{ display: "flex", background: "#FBF6F0", borderRadius: 12, padding: 3, marginBottom: 18, gap: 2 }}>
         {[["discomfort","😣","Discomfort / Pain"],["bm","🚽","Bowel Movement"]].map(([id, emoji, label]) => (
           <button key={id} onClick={() => { setCategory(id); reset(); }} style={{
