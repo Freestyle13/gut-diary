@@ -466,8 +466,8 @@ function HistoryTab({ entries, onDelete, onEdit, onExport, onBackup, onRestore }
                   )}
                   {e.notes && <div style={{ fontSize: 12, color: "#9A7A7A", fontStyle: "italic", marginTop: 4 }}>{e.notes}</div>}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "center" }}>
-                  <button onClick={() => onEdit(e)} style={{ border: "none", background: "none", color: "#C49A6C", fontSize: 14, cursor: "pointer", padding: "0 4px" }}>✏️</button>
+                <div style={{ display: "flex", flexDirection: "row", gap: 4, alignItems: "flex-start" }}>
+                  <button onClick={() => onEdit(e)} style={{ border: "none", background: "none", color: "#C49A6C", fontSize: 14, cursor: "pointer", padding: "0 4px" }}>✏</button>
                   <button onClick={() => onDelete(e.ts)} style={{ border: "none", background: "none", color: "#D4B0A0", fontSize: 14, cursor: "pointer", padding: "0 4px" }}>✕</button>
                 </div>
               </div>
