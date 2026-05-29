@@ -531,6 +531,115 @@ function BristolLineGraph({ entries }) {
   );
 }
 
+// ── Pain calendar ─────────────────────────────────────────────────────────────
+function PainCalendar({ entries }) {
+  const [view, setView] = useState("month");
+
+  // day key -> max pain
+  const dayPain = {};
+  entries.filter(e => e.type === "symptom" && e.pain > 0).forEach(e => {
+    const k = new Date(e.ts).toDateString();
+    dayPain[k] = Math.max(dayPain[k] || 0, e.pain);
+  });
+
+  const cellStyle = (d) => {
+    if (!d) return {};
+    const p = dayPain[d.toDateString()];
+    if (!p) return { bg: "#F5EDE4", text: "#C0A8A0", border: "transparent" };
+    if (p >= 7) return { bg: "#E6394622", text: "#E63946", border: "#E6394660" };
+    if (p >= 4) return { bg: "#F4A26122", text: "#C47A30", border: "#F4A26160" };
+    return { bg: "#6BAF9222", text: "#4a9a78", border: "#6BAF9260" };
+  };
+
+  const today = new Date();
+  const DOW = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+  const Toggle = () => (
+    <div style={{ display: "flex", background: "#F5EDE4", borderRadius: 10, padding: 3, marginBottom: 14, gap: 2 }}>
+      {["week","month"].map(v => (
+        <button key={v} onClick={() => setView(v)} style={{
+          flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
+          fontSize: 12, fontWeight: 700, fontFamily: "inherit",
+          background: view === v ? "#3D2C2C" : "none",
+          color: view === v ? "#FBF6F0" : "#9A7A7A",
+        }}>{v.charAt(0).toUpperCase() + v.slice(1)}</button>
+      ))}
+    </div>
+  );
+
+  const Legend = () => (
+    <div style={{ display: "flex", gap: 12, marginTop: 12, justifyContent: "center" }}>
+      {[["#6BAF92","1–3"],["#F4A261","4–6"],["#E63946","7–10"],["#F5EDE4","none"]].map(([c, l]) => (
+        <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ width: 10, height: 10, borderRadius: 3, background: c + "40", border: `1.5px solid ${c}` }} />
+          <span style={{ fontSize: 10, color: "#9A7A7A" }}>{l}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (view === "week") {
+    const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return d; });
+    return (
+      <div>
+        <Toggle />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+          {days.map((d, i) => {
+            const cs = cellStyle(d);
+            const pain = dayPain[d.toDateString()];
+            const isToday = d.toDateString() === today.toDateString();
+            return (
+              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                background: cs.bg, border: `1.5px solid ${isToday ? "#3D2C2C" : cs.border}`,
+                borderRadius: 10, padding: "8px 2px" }}>
+                <span style={{ fontSize: 9, color: "#9A7A7A", fontWeight: 600 }}>{DOW[d.getDay()]}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: isToday ? "#3D2C2C" : cs.text }}>{d.getDate()}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: cs.text, minHeight: 14 }}>{pain || ""}</span>
+              </div>
+            );
+          })}
+        </div>
+        <Legend />
+      </div>
+    );
+  }
+
+  // Month view
+  const year = today.getFullYear(), month = today.getMonth();
+  const monthName = today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells = [...Array(firstDow).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => new Date(year, month, i + 1))];
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  return (
+    <div>
+      <Toggle />
+      <div style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "#3D2C2C", marginBottom: 10, fontFamily: "Georgia,serif" }}>{monthName}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2, marginBottom: 4 }}>
+        {DOW.map(d => <div key={d} style={{ textAlign: "center", fontSize: 9, color: "#B09090", fontWeight: 700, padding: "2px 0" }}>{d}</div>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 3 }}>
+        {cells.map((d, i) => {
+          if (!d) return <div key={i} />;
+          const cs = cellStyle(d);
+          const pain = dayPain[d.toDateString()];
+          const isToday = d.toDateString() === today.toDateString();
+          return (
+            <div key={i} style={{ aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center",
+              justifyContent: "center", borderRadius: 7, background: cs.bg,
+              border: `1.5px solid ${isToday ? "#3D2C2C" : cs.border}`, gap: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: isToday ? 700 : 400, color: isToday ? "#3D2C2C" : cs.text }}>{d.getDate()}</span>
+              {pain && <span style={{ fontSize: 8, fontWeight: 700, color: cs.text, lineHeight: 1 }}>{pain}</span>}
+            </div>
+          );
+        })}
+      </div>
+      <Legend />
+    </div>
+  );
+}
+
 // ── Insights Tab ──────────────────────────────────────────────────────────────
 function InsightsTab({ entries }) {
   const sE = entries.filter(e => e.type === "symptom");
@@ -590,6 +699,13 @@ function InsightsTab({ entries }) {
           </div>
         </div>
       )}
+
+      {/* Pain calendar */}
+      <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
+        <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>📅 Pain days</div>
+        <div style={{ fontSize: 11, color: "#B09090", marginBottom: 12 }}>Days with symptom entries, colored by max pain</div>
+        <PainCalendar entries={entries} />
+      </div>
 
       {/* Bristol line graph */}
       {hasBMs && (
