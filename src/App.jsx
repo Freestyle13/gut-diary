@@ -658,13 +658,46 @@ function InsightsTab({ entries }) {
   const topSym = Object.entries(symCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const preWindow = getPreSymptomWindow(entries);
   const hasBMs = sE.some(e => e.bristol);
+
+  // Avg days between bad events
+  const badDays = [...new Set(sE.filter(e => (e.pain || 0) >= 4).map(e => new Date(e.ts).toDateString()))]
+    .map(d => new Date(d)).sort((a, b) => a - b);
+  let avgDaysBetween = "—";
+  if (badDays.length >= 2) {
+    const gaps = badDays.slice(1).map((d, i) => (d - badDays[i]) / 86400000);
+    avgDaysBetween = (gaps.reduce((a, b) => a + b, 0) / gaps.length).toFixed(1);
+  }
+
+  // Streak — consecutive days without pain ≥ 4
+  let streak = 0;
+  const todayStr = new Date().toDateString();
+  const badDaySet = new Set(sE.filter(e => (e.pain || 0) >= 4).map(e => new Date(e.ts).toDateString()));
+  for (let i = 0; i <= 365; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (badDaySet.has(d.toDateString())) break;
+    streak++;
+  }
+
+  // Time of day buckets
+  const timeBuckets = { Morning: 0, Afternoon: 0, Evening: 0, Night: 0 };
+  sE.filter(e => e.pain > 0).forEach(e => {
+    const h = new Date(e.ts).getHours();
+    if (h >= 6 && h < 12) timeBuckets.Morning++;
+    else if (h >= 12 && h < 18) timeBuckets.Afternoon++;
+    else if (h >= 18 && h < 22) timeBuckets.Evening++;
+    else timeBuckets.Night++;
+  });
+  const maxBucket = Math.max(...Object.values(timeBuckets), 1);
+  const bucketEmoji = { Morning: "🌅", Afternoon: "☀️", Evening: "🌆", Night: "🌙" };
+  const bucketTime = { Morning: "6am–12pm", Afternoon: "12–6pm", Evening: "6–10pm", Night: "10pm–6am" };
+
   return (
     <div>
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
-        {[[fE.length,"Meals logged"],[bE.length,"Drinks logged"],[sE.length,"Symptom logs"],[avgPain,"Avg pain score"]].map(([n, l], i) => (
+        {[[fE.length,"Meals logged"],[bE.length,"Drinks logged"],[sE.length,"Symptom logs"],[avgPain,"Avg pain score"],[`${avgDaysBetween}d`,"Avg days between flares"],[`${streak}d`,"Streak pain-free"]].map(([n, l], i) => (
           <div key={i} style={{ background: "#FFF", borderRadius: 16, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 32, fontWeight: 900, color: "#3D2C2C", lineHeight: 1 }}>{n}</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 32, fontWeight: 900, color: i === 5 && streak > 0 ? "#6BAF92" : "#3D2C2C", lineHeight: 1 }}>{n}</div>
             <div style={{ fontSize: 11, color: "#9A7A7A", marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{l}</div>
           </div>
         ))}
@@ -676,6 +709,25 @@ function InsightsTab({ entries }) {
         <div style={{ fontSize: 11, color: "#B09090", marginBottom: 12 }}>Days with symptom entries, colored by max pain</div>
         <PainCalendar entries={entries} />
       </div>
+
+      {/* Time of day */}
+      {sE.filter(e => e.pain > 0).length > 0 && (
+        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
+          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>🕐 Time of day</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 14 }}>When symptoms most often occur</div>
+          {Object.entries(timeBuckets).map(([name, count]) => (
+            <div key={name} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ fontSize: 12, color: "#3D2C2C", fontWeight: 600 }}>{bucketEmoji[name]} {name} <span style={{ color: "#B09090", fontWeight: 400 }}>{bucketTime[name]}</span></span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: count === maxBucket && count > 0 ? "#C49A6C" : "#9A7A7A" }}>{count}</span>
+              </div>
+              <div style={{ height: 8, background: "#F5EDE4", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${(count / maxBucket) * 100}%`, background: count === maxBucket && count > 0 ? "#C49A6C" : "#D4C0B0", borderRadius: 4, transition: "width 0.3s" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Bristol line graph */}
       {hasBMs && (
