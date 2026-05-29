@@ -715,6 +715,16 @@ function InsightsTab({ entries }) {
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
           <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>⏱ Before bad symptoms</div>
           <div style={{ fontSize: 11, color: "#B09090", marginBottom: 12 }}>Most common in the 4 hrs before pain ≥ 4 ({preWindow.total} events)</div>
+          {preWindow.foods.length > 0 && (
+            <div style={{ marginBottom: preWindow.drinks.length ? 14 : 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#9A7A7A", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Food keywords</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {preWindow.foods.map(([word, count]) => (
+                  <span key={word} style={{ fontSize: 12, padding: "4px 10px", borderRadius: 20, background: "#F4A26118", color: "#C47A30", fontWeight: 600 }}>{word} {count > 1 ? `×${count}` : ""}</span>
+                ))}
+              </div>
+            </div>
+          )}
           {preWindow.drinks.length > 0 && (<>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#9A7A7A", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Drinks</div>
             {preWindow.drinks.map(([id, count]) => {
@@ -727,16 +737,6 @@ function InsightsTab({ entries }) {
               );
             })}
           </>)}
-          {preWindow.foods.length > 0 && (
-            <div style={{ marginTop: preWindow.drinks.length ? 14 : 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#9A7A7A", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Food keywords</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {preWindow.foods.map(([word, count]) => (
-                  <span key={word} style={{ fontSize: 12, padding: "4px 10px", borderRadius: 20, background: "#F4A26118", color: "#C47A30", fontWeight: 600 }}>{word} {count > 1 ? `×${count}` : ""}</span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
