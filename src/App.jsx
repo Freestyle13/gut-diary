@@ -697,7 +697,7 @@ function InsightsTab({ entries }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
         {[[fE.length,"Meals logged"],[bE.length,"Drinks logged"],[sE.length,"Symptom logs"],[avgPain,"Avg pain score"],[`${avgDaysBetween}d`,"Avg days between flares"],[`${streak}d`,"Streak pain-free"]].map(([n, l], i) => (
           <div key={i} style={{ background: "#FFF", borderRadius: 16, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
-            <div style={{ fontFamily: "Georgia,serif", fontSize: 32, fontWeight: 900, color: i === 5 && streak > 0 ? "#6BAF92" : "#3D2C2C", lineHeight: 1 }}>{n}</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 32, fontWeight: 900, color: "#3D2C2C", lineHeight: 1 }}>{n}</div>
             <div style={{ fontSize: 11, color: "#9A7A7A", marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{l}</div>
           </div>
         ))}
