@@ -39,7 +39,7 @@ const now = () => new Date().toISOString();
 const fmtDate = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 const fmtTime = iso => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 // datetime-local input requires "YYYY-MM-DDTHH:MM"
-const toInputVal = () => { const d = new Date(); d.setSeconds(0,0); return d.toISOString().slice(0,16); };
+const toInputVal = () => { const d = new Date(); d.setSeconds(0,0); const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().slice(0,16); };
 const inputToISO = val => val ? new Date(val).toISOString() : now();
 
 // ── Constants ─────────────────────────────────────────────────────────────────
