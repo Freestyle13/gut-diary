@@ -452,12 +452,124 @@ function HistoryTab({ entries, onDelete, onExport, onBackup, onRestore }) {
   );
 }
 
+// ── Insights helpers ──────────────────────────────────────────────────────────
+const dayKey = ts => new Date(ts).toDateString();
+const avgArr = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+
+function buildDayPainMap(entries) {
+  const map = {};
+  entries.filter(e => e.type === "symptom" && e.pain > 0).forEach(e => {
+    const d = dayKey(e.ts);
+    if (!map[d]) map[d] = [];
+    map[d].push(e.pain);
+  });
+  return map;
+}
+
+function getDrinkCorrelations(entries) {
+  const dayPain = buildDayPainMap(entries);
+  const allSymDays = Object.keys(dayPain);
+  if (allSymDays.length < 4) return [];
+  const drinkDays = {};
+  entries.filter(e => e.type === "beverage").forEach(e => {
+    if (!drinkDays[e.drinkType]) drinkDays[e.drinkType] = new Set();
+    drinkDays[e.drinkType].add(dayKey(e.ts));
+  });
+  return Object.entries(drinkDays).map(([type, days]) => {
+    const withDays = allSymDays.filter(d => days.has(d));
+    const withoutDays = allSymDays.filter(d => !days.has(d));
+    if (withDays.length < 2 || withoutDays.length < 1) return null;
+    const withPain = avgArr(withDays.flatMap(d => dayPain[d]));
+    const withoutPain = avgArr(withoutDays.flatMap(d => dayPain[d]));
+    return { type, withPain, withoutPain, diff: withPain - withoutPain, count: days.size };
+  }).filter(Boolean).filter(r => Math.abs(r.diff) >= 0.5).sort((a, b) => b.diff - a.diff);
+}
+
+function getMealCorrelations(entries) {
+  const dayPain = buildDayPainMap(entries);
+  const allSymDays = Object.keys(dayPain);
+  if (allSymDays.length < 4) return [];
+  const mealDays = {};
+  entries.filter(e => e.type === "food").forEach(e => {
+    if (!mealDays[e.mealType]) mealDays[e.mealType] = new Set();
+    mealDays[e.mealType].add(dayKey(e.ts));
+  });
+  return Object.entries(mealDays).map(([type, days]) => {
+    const withDays = allSymDays.filter(d => days.has(d));
+    const withoutDays = allSymDays.filter(d => !days.has(d));
+    if (withDays.length < 2 || withoutDays.length < 1) return null;
+    const withPain = avgArr(withDays.flatMap(d => dayPain[d]));
+    const withoutPain = avgArr(withoutDays.flatMap(d => dayPain[d]));
+    return { type, withPain, withoutPain, diff: withPain - withoutPain, count: days.size };
+  }).filter(Boolean).filter(r => Math.abs(r.diff) >= 0.3).sort((a, b) => b.diff - a.diff);
+}
+
+const FOOD_STOP = new Set(["with","the","and","some","bit","side","fresh","fried","grilled","baked","steamed","large","small","medium","cup","bowl","plate","glass","slice","pieces","two","three","one","half","whole","from","have","were","that","this","after","also","just"]);
+
+function getPreSymptomWindow(entries, windowHours = 4, minPain = 4) {
+  const bad = entries.filter(e => e.type === "symptom" && (e.pain || 0) >= minPain);
+  if (!bad.length) return null;
+  const drinkCounts = {}, foodWords = {};
+  bad.forEach(sym => {
+    const symTime = new Date(sym.ts).getTime();
+    const winStart = symTime - windowHours * 3600000;
+    entries.forEach(e => {
+      const t = new Date(e.ts).getTime();
+      if (t < winStart || t >= symTime) return;
+      if (e.type === "beverage") drinkCounts[e.drinkType] = (drinkCounts[e.drinkType] || 0) + 1;
+      if (e.type === "food" && e.foods) {
+        e.foods.toLowerCase().replace(/[^a-z\s]/g, " ").split(/\s+/).forEach(w => {
+          if (w.length >= 4 && !FOOD_STOP.has(w)) foodWords[w] = (foodWords[w] || 0) + 1;
+        });
+      }
+    });
+  });
+  return {
+    drinks: Object.entries(drinkCounts).sort((a, b) => b[1] - a[1]).slice(0, 5),
+    foods: Object.entries(foodWords).sort((a, b) => b[1] - a[1]).slice(0, 10),
+    total: bad.length,
+  };
+}
+
 // ── Insights Tab ──────────────────────────────────────────────────────────────
+function CorrelationRow({ label, emoji, withPain, withoutPain, diff, count }) {
+  const isHigh = diff > 1.5;
+  const isMid = diff > 0.5;
+  const color = diff > 0 ? (isHigh ? "#E63946" : isMid ? "#F4A261" : "#9A7A7A") : "#6BAF92";
+  const badge = diff > 1.5 ? "⚠️ Likely trigger" : diff > 0.5 ? "⚡ Mild link" : diff < -0.5 ? "✅ Seems fine" : null;
+  return (
+    <div style={{ padding: "10px 0", borderBottom: "1px solid #F5EDE4" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 16 }}>{emoji}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#3D2C2C" }}>{label}</span>
+          {badge && <span style={{ fontSize: 10, fontWeight: 700, color, background: color + "18", padding: "2px 6px", borderRadius: 8 }}>{badge}</span>}
+        </div>
+        <span style={{ fontSize: 11, color: "#B09090" }}>{count} days</span>
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <span style={{ fontSize: 10, color: "#9A7A7A", width: 44 }}>With</span>
+        <div style={{ flex: 1, height: 8, background: "#F5EDE4", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${(withPain / 10) * 100}%`, background: color, borderRadius: 4 }} />
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 700, color, width: 28, textAlign: "right" }}>{withPain.toFixed(1)}</span>
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
+        <span style={{ fontSize: 10, color: "#9A7A7A", width: 44 }}>Without</span>
+        <div style={{ flex: 1, height: 8, background: "#F5EDE4", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${(withoutPain / 10) * 100}%`, background: "#6BAF92", borderRadius: 4 }} />
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#6BAF92", width: 28, textAlign: "right" }}>{withoutPain.toFixed(1)}</span>
+      </div>
+    </div>
+  );
+}
+
 function InsightsTab({ entries }) {
   const sE = entries.filter(e => e.type === "symptom");
   const fE = entries.filter(e => e.type === "food");
   const bE = entries.filter(e => e.type === "beverage");
-  if (entries.length < 3) return (
+  if (entries.length < 5) return (
     <div style={{ textAlign: "center", padding: "60px 20px", color: "#B09090" }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
       <div style={{ fontFamily: "Georgia,serif", fontSize: 18 }}>Log more entries</div>
@@ -467,13 +579,10 @@ function InsightsTab({ entries }) {
   const avgPain = sE.length ? (sE.reduce((a, e) => a + (e.pain || 0), 0) / sE.length).toFixed(1) : "—";
   const symCount = {};
   sE.forEach(e => (e.symptoms || []).forEach(s => { symCount[s] = (symCount[s] || 0) + 1; }));
-  const topSym = Object.entries(symCount).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const topSym = Object.entries(symCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const bristolCount = {};
   sE.forEach(e => { if (e.bristol) bristolCount[e.bristol] = (bristolCount[e.bristol] || 0) + 1; });
   const maxB = Math.max(...Object.values(bristolCount), 1);
-  const drinkCount = {};
-  bE.forEach(e => { if (e.drinkType) drinkCount[e.drinkType] = (drinkCount[e.drinkType] || 0) + 1; });
-  const topDrinks = Object.entries(drinkCount).sort((a, b) => b[1] - a[1]).slice(0, 4);
   const last7 = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
@@ -482,8 +591,12 @@ function InsightsTab({ entries }) {
     const pain = day.length ? day.reduce((a, x) => a + (x.pain || 0), 0) / day.length : null;
     last7.push({ label, pain });
   }
+  const drinkCorr = getDrinkCorrelations(entries);
+  const mealCorr = getMealCorrelations(entries);
+  const preWindow = getPreSymptomWindow(entries);
   return (
     <div>
+      {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
         {[[fE.length,"Meals logged"],[bE.length,"Drinks logged"],[sE.length,"Symptom logs"],[avgPain,"Avg pain score"]].map(([n, l], i) => (
           <div key={i} style={{ background: "#FFF", borderRadius: 16, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
@@ -492,6 +605,8 @@ function InsightsTab({ entries }) {
           </div>
         ))}
       </div>
+
+      {/* Pain this week */}
       {last7.some(d => d.pain !== null) && (
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
           <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 12 }}>📈 Pain this week</div>
@@ -512,18 +627,55 @@ function InsightsTab({ entries }) {
           </div>
         </div>
       )}
-      {topDrinks.length > 0 && (
+
+      {/* Drink correlations */}
+      {drinkCorr.length > 0 && (
         <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
-          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 12 }}>🥤 Most logged drinks</div>
-          {topDrinks.map(([id, c]) => {
-            const dt = DRINK_TYPES.find(d => d.id === id);
-            return (
-              <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: "1px solid #F5EDE4" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 18 }}>{dt?.emoji}</span><span style={{ fontSize: 14, color: "#3D2C2C" }}>{dt?.label}</span></div>
-                <span style={{ fontFamily: "Georgia,serif", fontWeight: 700, color: dt?.color || "#5B9BD5", fontSize: 16 }}>{c}×</span>
-              </div>
-            );
+          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>🥤 Drinks & pain</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 12 }}>Avg pain score on days you logged each drink vs days you didn't</div>
+          {drinkCorr.map(r => {
+            const dt = DRINK_TYPES.find(d => d.id === r.type);
+            return <CorrelationRow key={r.type} label={dt?.label || r.type} emoji={dt?.emoji || "🥤"} {...r} />;
           })}
+        </div>
+      )}
+
+      {/* Meal correlations */}
+      {mealCorr.length > 0 && (
+        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
+          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>🍽️ Meal types & pain</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 12 }}>Avg pain score on days each meal type was logged vs days it wasn't</div>
+          {mealCorr.map(r => <CorrelationRow key={r.type} label={r.type} emoji="🍽️" {...r} />)}
+        </div>
+      )}
+
+      {/* Pre-symptom window */}
+      {preWindow && (preWindow.drinks.length > 0 || preWindow.foods.length > 0) && (
+        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
+          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 4 }}>⏱ Before bad symptoms</div>
+          <div style={{ fontSize: 11, color: "#B09090", marginBottom: 12 }}>Most common in the 4 hrs before pain ≥ 4 ({preWindow.total} events)</div>
+          {preWindow.drinks.length > 0 && (<>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#9A7A7A", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Drinks</div>
+            {preWindow.drinks.map(([id, count]) => {
+              const dt = DRINK_TYPES.find(d => d.id === id);
+              return (
+                <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid #F5EDE4" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>{dt?.emoji || "🥤"}</span><span style={{ fontSize: 13, color: "#3D2C2C" }}>{dt?.label || id}</span></div>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#C49A6C" }}>{count}×</span>
+                </div>
+              );
+            })}
+          </>)}
+          {preWindow.foods.length > 0 && (
+            <div style={{ marginTop: preWindow.drinks.length ? 14 : 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#9A7A7A", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Food keywords</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {preWindow.foods.map(([word, count]) => (
+                  <span key={word} style={{ fontSize: 12, padding: "4px 10px", borderRadius: 20, background: "#F4A26118", color: "#C47A30", fontWeight: 600 }}>{word} {count > 1 ? `×${count}` : ""}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
       {Object.keys(bristolCount).length > 0 && (
