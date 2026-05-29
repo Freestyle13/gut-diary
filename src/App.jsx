@@ -656,14 +656,6 @@ function InsightsTab({ entries }) {
   const symCount = {};
   sE.forEach(e => (e.symptoms || []).forEach(s => { symCount[s] = (symCount[s] || 0) + 1; }));
   const topSym = Object.entries(symCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const last7 = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const label = d.toLocaleDateString("en-US", { weekday: "short" });
-    const day = sE.filter(e => fmtDate(e.ts) === fmtDate(d.toISOString()));
-    const pain = day.length ? day.reduce((a, x) => a + (x.pain || 0), 0) / day.length : null;
-    last7.push({ label, pain });
-  }
   const preWindow = getPreSymptomWindow(entries);
   const hasBMs = sE.some(e => e.bristol);
   return (
@@ -677,28 +669,6 @@ function InsightsTab({ entries }) {
           </div>
         ))}
       </div>
-
-      {/* Pain this week */}
-      {last7.some(d => d.pain !== null) && (
-        <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
-          <div style={{ fontFamily: "Georgia,serif", fontSize: 16, fontWeight: 700, color: "#3D2C2C", marginBottom: 12 }}>📈 Pain this week</div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 90 }}>
-            {last7.map((d, i) => {
-              const h = d.pain !== null ? Math.max((d.pain / 10) * 72, 4) : 4;
-              const c = d.pain > 6 ? "#E63946" : d.pain > 3 ? "#F4A261" : "#6BAF92";
-              return (
-                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                  {d.pain !== null && <div style={{ fontSize: 10, color: "#9A7A7A" }}>{Number(d.pain).toFixed(0)}</div>}
-                  <div style={{ flex: 1, display: "flex", alignItems: "flex-end", width: "100%" }}>
-                    <div style={{ width: "100%", height: h, background: d.pain !== null ? c : "#EDE0D4", borderRadius: 4 }} />
-                  </div>
-                  <div style={{ fontSize: 10, color: "#9A7A7A" }}>{d.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Pain calendar */}
       <div style={{ background: "#FFF", borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: "0 1px 8px rgba(61,44,44,0.06)" }}>
